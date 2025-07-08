@@ -83,8 +83,18 @@ void setup() {
   setupRelay();
 }
 
+void sendDataToAnotherModule(int mq, int ms, int tgs){
+    Serial2.print(mq);
+    Serial2.print(",");
+    Serial2.print(ms);
+    Serial2.print(",");
+    Serial2.println(tgs);
+}
+
 void activateDetection() {
   digitalWrite(LED_RED_PIN, HIGH);
+
+  Serial2.println("DETECTION");
 
   digitalWrite(RELAY_PUMP_IN_PIN, LOW);
   delay(10000);
@@ -95,23 +105,24 @@ void activateDetection() {
     int ms = analogRead(MS_PIN);
     int tgs = analogRead(TGS_PIN);
 
-    Serial.print("MQ135: ");
-    Serial.println(mq);
-    
-    Serial2.print(mq);
-    Serial2.print(",");
-    Serial2.print(ms);
-    Serial2.print(",");
-    Serial2.println(tgs);
-    // sendDataToServer(mq, mq, mq);
+    // Serial.print("MQ135: ");
+    // Serial.println(mq);
+
+    sendDataToAnotherModule(mq, mq, mq);
+    sendDataToServer(mq, mq, mq);
     delay(1000);
   }
+
+  Serial2.println("STOP");
 
   digitalWrite(LED_RED_PIN, LOW);
 }
 
 void activateDry() {
   digitalWrite(LED_YELLOW_PIN, HIGH);
+
+  Serial2.println("DRY");
+
   digitalWrite(RELAY_FAN_PIN, LOW);
   servo.write(0);
   delay(1000);
@@ -121,22 +132,37 @@ void activateDry() {
   delay(1000);
   servo.write(90);
   digitalWrite(RELAY_FAN_PIN, HIGH);
+
+  Serial2.println("STOP");
+
   digitalWrite(LED_YELLOW_PIN, LOW);
 }
 
 void activateMist() {
   digitalWrite(LED_BLUE_PIN, HIGH);
+
+  Serial2.println("CLEAN");
+
   digitalWrite(RELAY_MIST_PIN, LOW);
   delay(10000);
   digitalWrite(RELAY_MIST_PIN, HIGH);
+
+  Serial2.println("STOP");
+
   digitalWrite(LED_BLUE_PIN, LOW);
 }
 
 void activatePumpOut() {
   digitalWrite(LED_GREEN_PIN, HIGH);
+
+  Serial2.println("OUT");
+
   digitalWrite(RELAY_PUMP_OUT_PIN, LOW);
   delay(10000);
   digitalWrite(RELAY_PUMP_OUT_PIN, HIGH);
+
+  Serial2.println("STOP");
+
   digitalWrite(LED_GREEN_PIN, LOW);
 }
 

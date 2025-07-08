@@ -92,13 +92,17 @@ void activateDetection() {
 
   for (int i = 0; i < timeDetection; i++) {
     int mq = analogRead(MQ_PIN);
+    int ms = analogRead(MS_PIN);
+    int tgs = analogRead(TGS_PIN);
+
     Serial.print("MQ135: ");
     Serial.println(mq);
+    
     Serial2.print(mq);
     Serial2.print(",");
-    Serial2.print(mq);
+    Serial2.print(ms);
     Serial2.print(",");
-    Serial2.println(mq);
+    Serial2.println(tgs);
     // sendDataToServer(mq, mq, mq);
     delay(1000);
   }
@@ -108,8 +112,6 @@ void activateDetection() {
 
 void activateDry() {
   digitalWrite(LED_YELLOW_PIN, HIGH);
-  // Serial2.println("DRY");
-  // delay(13000);
   digitalWrite(RELAY_FAN_PIN, LOW);
   servo.write(0);
   delay(1000);
@@ -179,5 +181,5 @@ void loop() {
   } else if (digitalRead(BUTTON_GREEN_PIN) == LOW) {
     activatePumpOut();
   }
-  activateDetection();
+  // activateDetection();
 }

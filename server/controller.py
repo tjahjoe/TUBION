@@ -5,7 +5,9 @@ import requests
 class Controller:
     def __init__(self, app_instance):
         self._app = app_instance
-        self.__data = None
+        self.__mq = None
+        self.__ms = None
+        self.__tgs = None
 
         self.__setup_routes()
 
@@ -19,7 +21,9 @@ class Controller:
     def _insert_data(self):
         try:
             data = request.get_json()
-            self.__data = data.get('data')
+            self.__mq = data.get('mq')
+            self.__ms = data.get('ms')
+            self.__tgs = data.get('tgs')
 
             return jsonify({'message': 'Data saved successfully'}), 201
         except Exception as e:
@@ -27,10 +31,10 @@ class Controller:
     
     def _find_data(self):
         try:
-            if self.__data is not None:
-                return jsonify(self.__data), 200
-            else:
-                return jsonify({'message': 'No data found.'}), 404
+            # if self.__data is not None:
+            return jsonify(self.__mq, self.__ms, self.__tgs), 200
+            # else:
+                # return jsonify({'message': 'No data found.'}), 404
         except Exception as e:
             return str(e), 500
 

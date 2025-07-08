@@ -15,6 +15,8 @@ void setup() {
   tft.init();
   tft.setRotation(1);
   tft.fillScreen(TFT_BLACK);
+  tft.setTextColor(TFT_WHITE, TFT_BLACK);
+  tft.drawCentreString("READY", tft.width() / 2, tft.height() / 2 - 10, 2);
 }
 
 void getCommand() {
@@ -147,5 +149,9 @@ void loop() {
   } else if (command == "OUT") {
     displayOut();
     command = "";
+  } else {
+    tft.fillScreen(TFT_BLACK);
+    tft.setTextColor(TFT_WHITE, TFT_BLACK);
+    tft.drawCentreString("READY", tft.width() / 2, tft.height() / 2 - 10, 2);
   }
 }

@@ -35,6 +35,7 @@ int timeDetection = 60;
 Servo servo;
 
 const String FLASK_API_ENDPOINT = "http://192.168.1.4:5000/insert/data";
+String status = "CLEAN";
 
 void setupButton() {
   pinMode(BUTTON_RED_PIN, INPUT_PULLUP);
@@ -47,10 +48,12 @@ void setupRelay() {
   pinMode(RELAY_MIST_PIN, OUTPUT);
   pinMode(RELAY_PUMP_OUT_PIN, OUTPUT);
   pinMode(RELAY_PUMP_IN_PIN, OUTPUT);
+  pinMode(RELAY_FAN_PIN, OUTPUT);
 
   digitalWrite(RELAY_MIST_PIN, HIGH);
   digitalWrite(RELAY_PUMP_OUT_PIN, HIGH);
   digitalWrite(RELAY_PUMP_IN_PIN, HIGH);
+  digitalWrite(RELAY_FAN_PIN, HIGH);
 }
 
 void setupLed() {
@@ -81,6 +84,7 @@ void setup() {
   setupLed();
   setupButton();
   setupRelay();
+  servo.attach(SERVO_PIN);
 }
 
 void sendDataToAnotherModule(int mq, int ms, int tgs){
@@ -198,13 +202,15 @@ bool sendDataToServer(int mq, int ms, int tgs) {
 }
 
 void loop() {
-  if (digitalRead(BUTTON_RED_PIN) == LOW) {
+  if (digitalRead(BUTTON_RED_PIN) == LOW && status == "CLEAN") {
     activateDetection();
-  } else if (digitalRead(BUTTON_YELLOW_PIN) == LOW) {
+    status = "DIRT"
+  } else if (digitalRead(BUTTON_YELLOW_PIN) == LOW && status == "CLEAN") {
     activateDry();
   } else if (digitalRead(BUTTON_BLUE_PIN) == LOW) {
     activateMist();
-  } else if (digitalRead(BUTTON_GREEN_PIN) == LOW) {
+    status = "CLEAN"
+  } else if (digitalRead(BUTTON_GREEN_PIN) == LOW && status == "CLEAN") {
     activatePumpOut();
   }
   // activateDetection();

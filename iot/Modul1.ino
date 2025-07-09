@@ -68,6 +68,12 @@ void setupLed() {
   digitalWrite(LED_GREEN_PIN, LOW);
 }
 
+void setupSensor(){
+  pinMode(MQ_PIN, INPUT);
+  pinMode(MS_PIN, INPUT);
+  pinMode(TGS_PIN, INPUT);
+}
+
 void setupWiFi() {
   WiFi.begin(ssid, password);
   while (WiFi.status() != WL_CONNECTED) {
@@ -84,6 +90,7 @@ void setup() {
   setupLed();
   setupButton();
   setupRelay();
+  setupSensor();
   servo.attach(SERVO_PIN);
 }
 

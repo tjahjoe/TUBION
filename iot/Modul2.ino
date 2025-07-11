@@ -7,6 +7,14 @@
 TFT_eSPI tft = TFT_eSPI();
 
 String command = "";
+String status = "CLEAN";
+
+void defaultText() {
+  tft.fillScreen(TFT_BLACK);
+  tft.setTextColor(TFT_WHITE, TFT_BLACK);
+  tft.drawCentreString("READY", tft.width() / 2, tft.height() / 2 - 20, 4);
+  tft.drawCentreString(status, tft.width() / 2, tft.height() / 2 + 10, 4);
+}
 
 void setup() {
   Serial.begin(115200);
@@ -14,9 +22,14 @@ void setup() {
 
   tft.init();
   tft.setRotation(1);
+  defaultText();
+}
+
+void stopText(String text) {
   tft.fillScreen(TFT_BLACK);
   tft.setTextColor(TFT_WHITE, TFT_BLACK);
-  tft.drawCentreString("READY", tft.width() / 2, tft.height() / 2 - 10, 2);
+  tft.drawCentreString("STOPPED DETECTION MODE", tft.width() / 2, tft.height() / 2 - 10, 4);
+  delay(3000);
 }
 
 void getCommand() {
@@ -29,8 +42,8 @@ void getCommand() {
 
 void getData() {
   tft.fillScreen(TFT_BLACK);
-  tft.setTextColor(TFT_RED, TFT_BLACK);
-  tft.drawCentreString("DETECTION", tft.width() / 2, 10, 2);
+  tft.setTextColor(TFT_WHITE, TFT_BLACK);
+  tft.drawCentreString("DETECTION", tft.width() / 2, tft.height() / 2 - 20, 4);
 
   while (true) {
     if (Serial2.available()) {
@@ -38,8 +51,7 @@ void getData() {
       receivedData.trim();
 
       if (receivedData == "STOP") {
-        tft.setTextColor(TFT_RED, TFT_BLACK);
-        tft.drawCentreString("STOPPED DETECTION MODE", tft.width() / 2, tft.height() / 2 - 10, 2);
+        stopText("STOPPED DETECTION MODE");
         break;
       }
 
@@ -58,40 +70,41 @@ void getData() {
 }
 
 void displayData(float mq, float ms, float tgs) {
-  tft.fillRect(0, 40, tft.width(), tft.height() - 40, TFT_BLACK);
-
+  int y = tft.height() / 2;
+  int h = 40;
   int w = tft.width();
   int mq_x = w / 6;
   int ms_x = w / 2;
   int tgs_x = 5 * w / 6;
 
+  tft.fillRect(0, y, w, h, TFT_BLACK);
+
   char buffer[30];
 
   sprintf(buffer, "MQ: %.2f", mq);
-  tft.setTextColor(TFT_CYAN, TFT_BLACK);
-  tft.drawCentreString(buffer, mq_x, 80, 2);
+  tft.setTextColor(TFT_WHITE, TFT_BLACK);
+  tft.drawCentreString(buffer, mq_x, tft.height() / 2 + 10, 2);
 
   sprintf(buffer, "MS: %.2f", ms);
-  tft.setTextColor(TFT_YELLOW, TFT_BLACK);
-  tft.drawCentreString(buffer, ms_x, 80, 2);
+  tft.setTextColor(TFT_WHITE, TFT_BLACK);
+  tft.drawCentreString(buffer, ms_x, tft.height() / 2 + 10, 2);
 
   sprintf(buffer, "TGS: %.2f", tgs);
-  tft.setTextColor(TFT_MAGENTA, TFT_BLACK);
-  tft.drawCentreString(buffer, tgs_x, 80, 2);
+  tft.setTextColor(TFT_WHITE, TFT_BLACK);
+  tft.drawCentreString(buffer, tgs_x, tft.height() / 2 + 10, 2);
 }
 
 void displayClean() {
   tft.fillScreen(TFT_BLACK);
-  tft.setTextColor(TFT_BLUE, TFT_BLACK);
-  tft.drawCentreString("CLEANING", tft.width() / 2, tft.height() / 2 - 10, 2);
+  tft.setTextColor(TFT_WHITE, TFT_BLACK);
+  tft.drawCentreString("CLEANING", tft.width() / 2, tft.height() / 2 - 10, 4);
   while (true) {
     if (Serial2.available()) {
       String receivedData = Serial2.readStringUntil('\n');
       receivedData.trim();
 
       if (receivedData == "STOP") {
-        tft.setTextColor(TFT_BLUE, TFT_BLACK);
-        tft.drawCentreString("STOPPED CLEANING MODE", tft.width() / 2, tft.height() / 2 - 10, 2);
+        stopText("STOPPED CLEANING MODE");
         break;
       }
     }
@@ -100,16 +113,15 @@ void displayClean() {
 
 void displayDry() {
   tft.fillScreen(TFT_BLACK);
-  tft.setTextColor(TFT_YELLOW, TFT_BLACK);
-  tft.drawCentreString("DRYING", tft.width() / 2, tft.height() / 2 - 10, 2);
+  tft.setTextColor(TFT_WHITE, TFT_BLACK);
+  tft.drawCentreString("DRYING", tft.width() / 2, tft.height() / 2 - 10, 4);
   while (true) {
     if (Serial2.available()) {
       String receivedData = Serial2.readStringUntil('\n');
       receivedData.trim();
 
       if (receivedData == "STOP") {
-        tft.setTextColor(TFT_YELLOW, TFT_BLACK);
-        tft.drawCentreString("STOPPED DRYING MODE", tft.width() / 2, tft.height() / 2 - 10, 2);
+        stopText("STOPPED DRYING MODE");
         break;
       }
     }
@@ -118,16 +130,15 @@ void displayDry() {
 
 void displayOut() {
   tft.fillScreen(TFT_BLACK);
-  tft.setTextColor(TFT_GREEN, TFT_BLACK);
-  tft.drawCentreString("OUT", tft.width() / 2, tft.height() / 2 - 10, 2);
+  tft.setTextColor(TFT_WHITE, TFT_BLACK);
+  tft.drawCentreString("OUT", tft.width() / 2, tft.height() / 2 - 10, 4);
   while (true) {
     if (Serial2.available()) {
       String receivedData = Serial2.readStringUntil('\n');
       receivedData.trim();
 
       if (receivedData == "STOP") {
-        tft.setTextColor(TFT_GREEN, TFT_BLACK);
-        tft.drawCentreString("BLOWING OUT THE AIR", tft.width() / 2, tft.height() / 2 - 10, 2);
+        stopText("BLOWING OUT THE AIR");
         break;
       }
     }
@@ -139,19 +150,26 @@ void loop() {
 
   if (command == "DETECTION") {
     getData();
+    status = "DIRT";
+    defaultText();
     command = "";
   } else if (command == "CLEAN") {
     displayClean();
+    status = "CLEAN";
+    defaultText();
     command = "";
   } else if (command == "DRY") {
     displayDry();
+    defaultText();
     command = "";
   } else if (command == "OUT") {
     displayOut();
+    defaultText();
     command = "";
-  } else {
-    tft.fillScreen(TFT_BLACK);
-    tft.setTextColor(TFT_WHITE, TFT_BLACK);
-    tft.drawCentreString("READY", tft.width() / 2, tft.height() / 2 - 10, 2);
   }
+
+  //  for (int i = 0; i < 100; i++) {
+  //   displayData(i, i+1, i+2);
+  //   delay(1000);
+  // }
 }

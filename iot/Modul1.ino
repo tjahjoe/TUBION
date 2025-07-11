@@ -3,6 +3,9 @@
 #include <WiFi.h>
 #include <HTTPClient.h>
 #include <ESP32Servo.h>
+#include <WiFiManager.h>
+#include <FS.h>
+#include <LittleFS.h>
 
 #define LED_RED_PIN 4
 #define LED_YELLOW_PIN 5
@@ -27,6 +30,8 @@
 
 #define RXD2 16
 #define TXD2 17
+
+#define WIFI_CONFIG_FILE "/wifi_config.txt"
 
 const char *ssid = "Grayhouse";
 const char *password = "pinturumah";
@@ -74,19 +79,79 @@ void setupSensor(){
   pinMode(TGS_PIN, INPUT);
 }
 
-void setupWiFi() {
-  WiFi.begin(ssid, password);
-  while (WiFi.status() != WL_CONNECTED) {
-    delay(500);
-    Serial.println("Connecting to WiFi..");
+void initLittleFS() {
+  if (!LittleFS.begin(true)) {
+    Serial.println(F("ERROR: LittleFS Mount Failed"));
   }
-  Serial.println("Connected to the Wi-Fi network");
+}
+
+void saveWiFiCredentials(const String &ssid, const String &password) {
+  File file = LittleFS.open(WIFI_CONFIG_FILE, "w");
+  if (!file) return;
+  file.println(ssid);
+  file.println(password);
+  file.close();
+}
+
+bool loadWiFiCredentials(String &ssid, String &password) {
+  File file = LittleFS.open(WIFI_CONFIG_FILE, "r");
+  if (!file) return false;
+  ssid = file.readStringUntil('\n');
+  ssid.trim();
+  password = file.readStringUntil('\n');
+  password.trim();
+  file.close();
+  return (ssid.length() > 0);
+}
+
+void saveWiFiManagerParamsCallback() {
+  saveWiFiCredentials(WiFi.SSID(), WiFi.psk());
+}
+
+void deleteWiFiConfigFile() {
+  if (LittleFS.exists(WIFI_CONFIG_FILE)) {
+    LittleFS.remove(WIFI_CONFIG_FILE);
+    Serial.println("wifi_config.txt deleted.");
+  } else {
+    Serial.println("wifi_config.txt not found.");
+  }
+}
+
+void setupWiFi() {
+  initLittleFS();
+
+  String ssid, password;
+  bool credentialsLoaded = loadWiFiCredentials(ssid, password);
+
+  WiFiManager wm;
+  wm.setSaveConfigCallback(saveWiFiManagerParamsCallback);
+
+  if (credentialsLoaded) {
+    WiFi.begin(ssid.c_str(), password.c_str());
+
+    unsigned long startTime = millis();
+    while (WiFi.status() != WL_CONNECTED && millis() - startTime < 10000) {
+      delay(500);
+      Serial.print(F("."));
+    }
+    Serial.println();
+
+    if (WiFi.status() != WL_CONNECTED) {
+      if (!wm.autoConnect("TUBION", "12345678")) {
+        ESP.restart();
+      }
+    }
+  } else {
+    if (!wm.autoConnect("TUBION", "12345678")) {
+      ESP.restart();
+    }
+  }
 }
 
 void setup() {
   Serial.begin(115200);
   Serial2.begin(115200, SERIAL_8N1, RXD2, TXD2);
-  // setupWiFi();
+  setupWiFi();
   setupLed();
   setupButton();
   setupRelay();
@@ -211,12 +276,12 @@ bool sendDataToServer(int mq, int ms, int tgs) {
 void loop() {
   if (digitalRead(BUTTON_RED_PIN) == LOW && status == "CLEAN") {
     activateDetection();
-    status = "DIRT"
+    status = "DIRT";
   } else if (digitalRead(BUTTON_YELLOW_PIN) == LOW && status == "CLEAN") {
     activateDry();
   } else if (digitalRead(BUTTON_BLUE_PIN) == LOW) {
     activateMist();
-    status = "CLEAN"
+    status = "CLEAN";
   } else if (digitalRead(BUTTON_GREEN_PIN) == LOW && status == "CLEAN") {
     activatePumpOut();
   }

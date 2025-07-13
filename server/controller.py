@@ -19,31 +19,31 @@ class Controller:
 
 
 
-    def _insert_data(self):
-        try:
-            data = request.get_json()
-            self.__data = data.get('data')
-
-            return jsonify({'message': 'Data saved successfully'}), 201
-        except Exception as e:
-            return str(e), 500
-        
     # def _insert_data(self):
     #     try:
     #         data = request.get_json()
-    #         self.__mq = data.get('mq')
-    #         self.__ms = data.get('ms')
-    #         self.__tgs = data.get('tgs')
+    #         self.__data = data.get('data')
 
     #         return jsonify({'message': 'Data saved successfully'}), 201
     #     except Exception as e:
     #         return str(e), 500
+        
+    def _insert_data(self):
+        try:
+            data = request.get_json()
+            self.__mq = data.get('mq')
+            self.__ms = data.get('ms')
+            self.__tgs = data.get('tgs')
+
+            return jsonify({'message': 'Data saved successfully'}), 201
+        except Exception as e:
+            return str(e), 500
     
     def _find_data(self):
         try:
             # if self.__data is not None:
-            # return jsonify(self.__mq, self.__ms, self.__tgs), 200
-            return jsonify(self.__data), 200
+            return jsonify(self.__mq, self.__ms, self.__tgs), 200
+            # return jsonify(self.__data), 200
             # else:
                 # return jsonify({'message': 'No data found.'}), 404
         except Exception as e:

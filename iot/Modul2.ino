@@ -28,7 +28,8 @@ void setup() {
 void stopText(String text) {
   tft.fillScreen(TFT_BLACK);
   tft.setTextColor(TFT_WHITE, TFT_BLACK);
-  tft.drawCentreString("STOPPED DETECTION MODE", tft.width() / 2, tft.height() / 2 - 10, 4);
+  tft.drawCentreString("STOPPED", tft.width() / 2, tft.height() / 2 - 20, 4);
+  tft.drawCentreString(text, tft.width() / 2, tft.height() / 2 + 10, 4);
   delay(3000);
 }
 
@@ -45,13 +46,22 @@ void getData() {
   tft.setTextColor(TFT_WHITE, TFT_BLACK);
   tft.drawCentreString("DETECTION", tft.width() / 2, tft.height() / 2 - 20, 4);
 
+  while (Serial2.available()) Serial2.read();
+
   while (true) {
     if (Serial2.available()) {
       String receivedData = Serial2.readStringUntil('\n');
       receivedData.trim();
 
+      for (int i = 0; i < receivedData.length(); i++) {
+        if (!isPrintable(receivedData.charAt(i))) {
+          receivedData.remove(i, 1);
+          i--; 
+        }
+      }
+
       if (receivedData == "STOP") {
-        stopText("STOPPED DETECTION MODE");
+        stopText("DETECTION MODE");
         break;
       }
 
@@ -98,13 +108,25 @@ void displayClean() {
   tft.fillScreen(TFT_BLACK);
   tft.setTextColor(TFT_WHITE, TFT_BLACK);
   tft.drawCentreString("CLEANING", tft.width() / 2, tft.height() / 2 - 10, 4);
+
+  while (Serial2.available()) Serial2.read();
+
   while (true) {
     if (Serial2.available()) {
       String receivedData = Serial2.readStringUntil('\n');
       receivedData.trim();
 
+      for (int i = 0; i < receivedData.length(); i++) {
+        if (!isPrintable(receivedData.charAt(i))) {
+          receivedData.remove(i, 1);
+          i--; 
+        }
+      }
+
+      // Serial.println("Command: " + receivedData);
+
       if (receivedData == "STOP") {
-        stopText("STOPPED CLEANING MODE");
+        stopText("CLEANING MODE");
         break;
       }
     }
@@ -115,13 +137,25 @@ void displayDry() {
   tft.fillScreen(TFT_BLACK);
   tft.setTextColor(TFT_WHITE, TFT_BLACK);
   tft.drawCentreString("DRYING", tft.width() / 2, tft.height() / 2 - 10, 4);
+
+  while (Serial2.available()) Serial2.read();
+
   while (true) {
     if (Serial2.available()) {
       String receivedData = Serial2.readStringUntil('\n');
       receivedData.trim();
 
+      for (int i = 0; i < receivedData.length(); i++) {
+        if (!isPrintable(receivedData.charAt(i))) {
+          receivedData.remove(i, 1);
+          i--; 
+        }
+      }
+
+      // Serial.println("Command: " + receivedData);
+
       if (receivedData == "STOP") {
-        stopText("STOPPED DRYING MODE");
+        stopText("DRYING MODE");
         break;
       }
     }
@@ -132,13 +166,25 @@ void displayOut() {
   tft.fillScreen(TFT_BLACK);
   tft.setTextColor(TFT_WHITE, TFT_BLACK);
   tft.drawCentreString("OUT", tft.width() / 2, tft.height() / 2 - 10, 4);
+
+  while (Serial2.available()) Serial2.read();
+
   while (true) {
     if (Serial2.available()) {
       String receivedData = Serial2.readStringUntil('\n');
       receivedData.trim();
 
+      for (int i = 0; i < receivedData.length(); i++) {
+        if (!isPrintable(receivedData.charAt(i))) {
+          receivedData.remove(i, 1);
+          i--; 
+        }
+      }
+
+      // Serial.println("Command: " + receivedData);
+
       if (receivedData == "STOP") {
-        stopText("BLOWING OUT THE AIR");
+        stopText("OUT THE AIR");
         break;
       }
     }

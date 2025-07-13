@@ -8,14 +8,14 @@
 #include <LittleFS.h>
 
 #define LED_RED_PIN 4
-#define LED_YELLOW_PIN 5
-#define LED_BLUE_PIN 18
+#define LED_YELLOW_PIN 18
+#define LED_BLUE_PIN 5
 #define LED_GREEN_PIN 19
 
-#define BUTTON_RED_PIN 12
-#define BUTTON_YELLOW_PIN 13
+#define BUTTON_RED_PIN 27
+#define BUTTON_YELLOW_PIN 12
 #define BUTTON_BLUE_PIN 14
-#define BUTTON_GREEN_PIN 27
+#define BUTTON_GREEN_PIN 13
 
 #define SERVO_PIN 21
 
@@ -33,10 +33,10 @@
 
 #define WIFI_CONFIG_FILE "/wifi_config.txt"
 
-const char *ssid = "Grayhouse";
-const char *password = "pinturumah";
+// const char *ssid = "Grayhouse";
+// const char *password = "pinturumah";
 
-int timeDetection = 60;
+int timeDetection = 5;
 Servo servo;
 
 const String FLASK_API_ENDPOINT = "http://192.168.1.4:5000/insert/data";
@@ -184,8 +184,8 @@ void activateDetection() {
     // Serial.print("MQ135: ");
     // Serial.println(mq);
 
-    sendDataToAnotherModule(mq, mq, mq);
-    sendDataToServer(mq, mq, mq);
+    sendDataToAnotherModule(mq, ms, tgs);
+    sendDataToServer(mq, ms, tgs);
     delay(1000);
   }
 
@@ -286,4 +286,7 @@ void loop() {
     activatePumpOut();
   }
   // activateDetection();
+  // activateDry();
+  // activateMist();
+  // activatePumpOut();
 }

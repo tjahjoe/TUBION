@@ -9,14 +9,16 @@ TFT_eSPI tft = TFT_eSPI();
 String command = "";
 String status = "CLEAN";
 
-void defaultText() {
+void defaultText()
+{
   tft.fillScreen(TFT_BLACK);
   tft.setTextColor(TFT_WHITE, TFT_BLACK);
   tft.drawCentreString("READY", tft.width() / 2, tft.height() / 2 - 20, 4);
   tft.drawCentreString(status, tft.width() / 2, tft.height() / 2 + 10, 4);
 }
 
-void setup() {
+void setup()
+{
   Serial.begin(115200);
   Serial2.begin(115200, SERIAL_8N1, RXD2, TXD2);
 
@@ -25,7 +27,8 @@ void setup() {
   defaultText();
 }
 
-void stopText(String text) {
+void stopText(String text)
+{
   tft.fillScreen(TFT_BLACK);
   tft.setTextColor(TFT_WHITE, TFT_BLACK);
   tft.drawCentreString("STOPPED", tft.width() / 2, tft.height() / 2 - 20, 4);
@@ -33,34 +36,43 @@ void stopText(String text) {
   delay(3000);
 }
 
-void getCommand() {
-  if (Serial2.available()) {
+void getCommand()
+{
+  if (Serial2.available())
+  {
     command = Serial2.readStringUntil('\n');
     command.trim();
     Serial.println("Command: " + command);
   }
 }
 
-void getData() {
+void getData()
+{
   tft.fillScreen(TFT_BLACK);
   tft.setTextColor(TFT_WHITE, TFT_BLACK);
   tft.drawCentreString("DETECTION", tft.width() / 2, tft.height() / 2 - 20, 4);
 
-  while (Serial2.available()) Serial2.read();
+  while (Serial2.available())
+    Serial2.read();
 
-  while (true) {
-    if (Serial2.available()) {
+  while (true)
+  {
+    if (Serial2.available())
+    {
       String receivedData = Serial2.readStringUntil('\n');
       receivedData.trim();
 
-      for (int i = 0; i < receivedData.length(); i++) {
-        if (!isPrintable(receivedData.charAt(i))) {
+      for (int i = 0; i < receivedData.length(); i++)
+      {
+        if (!isPrintable(receivedData.charAt(i)))
+        {
           receivedData.remove(i, 1);
-          i--; 
+          i--;
         }
       }
 
-      if (receivedData == "STOP") {
+      if (receivedData == "STOP")
+      {
         stopText("DETECTION MODE");
         break;
       }
@@ -68,7 +80,8 @@ void getData() {
       int firstComma = receivedData.indexOf(',');
       int lastComma = receivedData.lastIndexOf(',');
 
-      if (firstComma > 0 && lastComma > firstComma) {
+      if (firstComma > 0 && lastComma > firstComma)
+      {
         float mq = receivedData.substring(0, firstComma).toFloat();
         float ms = receivedData.substring(firstComma + 1, lastComma).toFloat();
         float tgs = receivedData.substring(lastComma + 1).toFloat();
@@ -79,7 +92,8 @@ void getData() {
   }
 }
 
-void displayData(float mq, float ms, float tgs) {
+void displayData(float mq, float ms, float tgs)
+{
   int y = tft.height() / 2;
   int h = 40;
   int w = tft.width();
@@ -104,28 +118,35 @@ void displayData(float mq, float ms, float tgs) {
   tft.drawCentreString(buffer, tgs_x, tft.height() / 2 + 10, 2);
 }
 
-void displayClean() {
+void displayClean()
+{
   tft.fillScreen(TFT_BLACK);
   tft.setTextColor(TFT_WHITE, TFT_BLACK);
   tft.drawCentreString("CLEANING", tft.width() / 2, tft.height() / 2 - 10, 4);
 
-  while (Serial2.available()) Serial2.read();
+  while (Serial2.available())
+    Serial2.read();
 
-  while (true) {
-    if (Serial2.available()) {
+  while (true)
+  {
+    if (Serial2.available())
+    {
       String receivedData = Serial2.readStringUntil('\n');
       receivedData.trim();
 
-      for (int i = 0; i < receivedData.length(); i++) {
-        if (!isPrintable(receivedData.charAt(i))) {
+      for (int i = 0; i < receivedData.length(); i++)
+      {
+        if (!isPrintable(receivedData.charAt(i)))
+        {
           receivedData.remove(i, 1);
-          i--; 
+          i--;
         }
       }
 
       // Serial.println("Command: " + receivedData);
 
-      if (receivedData == "STOP") {
+      if (receivedData == "STOP")
+      {
         stopText("CLEANING MODE");
         break;
       }
@@ -133,28 +154,35 @@ void displayClean() {
   }
 }
 
-void displayDry() {
+void displayDry()
+{
   tft.fillScreen(TFT_BLACK);
   tft.setTextColor(TFT_WHITE, TFT_BLACK);
   tft.drawCentreString("DRYING", tft.width() / 2, tft.height() / 2 - 10, 4);
 
-  while (Serial2.available()) Serial2.read();
+  while (Serial2.available())
+    Serial2.read();
 
-  while (true) {
-    if (Serial2.available()) {
+  while (true)
+  {
+    if (Serial2.available())
+    {
       String receivedData = Serial2.readStringUntil('\n');
       receivedData.trim();
 
-      for (int i = 0; i < receivedData.length(); i++) {
-        if (!isPrintable(receivedData.charAt(i))) {
+      for (int i = 0; i < receivedData.length(); i++)
+      {
+        if (!isPrintable(receivedData.charAt(i)))
+        {
           receivedData.remove(i, 1);
-          i--; 
+          i--;
         }
       }
 
       // Serial.println("Command: " + receivedData);
 
-      if (receivedData == "STOP") {
+      if (receivedData == "STOP")
+      {
         stopText("DRYING MODE");
         break;
       }
@@ -162,28 +190,35 @@ void displayDry() {
   }
 }
 
-void displayOut() {
+void displayOut()
+{
   tft.fillScreen(TFT_BLACK);
   tft.setTextColor(TFT_WHITE, TFT_BLACK);
   tft.drawCentreString("OUT", tft.width() / 2, tft.height() / 2 - 10, 4);
 
-  while (Serial2.available()) Serial2.read();
+  while (Serial2.available())
+    Serial2.read();
 
-  while (true) {
-    if (Serial2.available()) {
+  while (true)
+  {
+    if (Serial2.available())
+    {
       String receivedData = Serial2.readStringUntil('\n');
       receivedData.trim();
 
-      for (int i = 0; i < receivedData.length(); i++) {
-        if (!isPrintable(receivedData.charAt(i))) {
+      for (int i = 0; i < receivedData.length(); i++)
+      {
+        if (!isPrintable(receivedData.charAt(i)))
+        {
           receivedData.remove(i, 1);
-          i--; 
+          i--;
         }
       }
 
       // Serial.println("Command: " + receivedData);
 
-      if (receivedData == "STOP") {
+      if (receivedData == "STOP")
+      {
         stopText("OUT THE AIR");
         break;
       }
@@ -191,31 +226,34 @@ void displayOut() {
   }
 }
 
-void loop() {
+void loop()
+{
   getCommand();
 
-  if (command == "DETECTION") {
+  if (command == "DETECTION")
+  {
     getData();
     status = "DIRT";
     defaultText();
     command = "";
-  } else if (command == "CLEAN") {
+  }
+  else if (command == "CLEAN")
+  {
     displayClean();
     status = "CLEAN";
     defaultText();
     command = "";
-  } else if (command == "DRY") {
+  }
+  else if (command == "DRY")
+  {
     displayDry();
     defaultText();
     command = "";
-  } else if (command == "OUT") {
+  }
+  else if (command == "OUT")
+  {
     displayOut();
     defaultText();
     command = "";
   }
-
-  //  for (int i = 0; i < 100; i++) {
-  //   displayData(i, i+1, i+2);
-  //   delay(1000);
-  // }
 }

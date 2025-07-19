@@ -43,8 +43,8 @@ int readIndex = 0;
 
 const float VTGS = 5.0;
 const int RLTGS = 10;
-const float mTGS = -0.574;
-const float bTGS = 1.324;
+const float mTGS = -0.160;
+const float bTGS = 1.368;
 const float RoTGS = 1.0;
 float TGSReadings[numReadings];
 float TGSTotal = 0;
@@ -59,8 +59,8 @@ float MQTotal = 0;
 
 const float VMS = 5.0;
 const int RLMS = 2;
-const float mMS = -0.574;
-const float bMS = 1.324;
+const float mMS = -0.223;
+const float bMS = -0.227;
 const float RoMS = 1.0;
 float MSReadings[numReadings];
 float MSTotal = 0;

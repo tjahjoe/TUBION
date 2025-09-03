@@ -36,7 +36,7 @@ const String FLASK_API_ENDPOINT = "http://192.168.1.4:5000/insert/data";
 
 Servo servo;
 
-const int timeDetection = 5;
+const int timeDetection = 60;
 const int numReadings = 5;
 int validReadings = 0;
 int readIndex = 0;
@@ -47,6 +47,7 @@ const float mTGS = -0.160;
 const float bTGS = 1.368;
 const float RoTGS = 1.0;
 float TGSReadings[numReadings];
+float TGSSend[timeDetection];
 float TGSTotal = 0;
 
 const float VMQ = 5.0;
@@ -55,6 +56,7 @@ const float mMQ = -0.417;
 const float bMQ = -0.858;
 const float RoMQ = 7.0;
 float MQReadings[numReadings];
+float MQSend[timeDetection];
 float MQTotal = 0;
 
 const float VMS = 5.0;
@@ -63,6 +65,7 @@ const float mMS = -0.223;
 const float bMS = -0.227;
 const float RoMS = 1.0;
 float MSReadings[numReadings];
+float MSSend[timeDetection];
 float MSTotal = 0;
 
 String status = "CLEAN";
@@ -265,9 +268,14 @@ void activateDetection()
     readIndex = (readIndex + 1) % numReadings;
 
     sendDataToAnotherModule(mq, ms, tgs);
-    sendDataToServer(mq, ms, tgs);
+    
+    MQSend[i] = mq;
+    MSSend[i] = ms;
+    TGSSend[i] = tgs;
     delay(1000);
   }
+
+  sendDataToServer(MQSend, MSSend, TGSSend);
 
   Serial2.println("STOP");
 
@@ -325,7 +333,7 @@ void activatePumpOut()
   digitalWrite(LED_GREEN_PIN, LOW);
 }
 
-bool sendDataToServer(float mq, float ms, float tgs)
+bool sendDataToServer(float mqArr[], float msArr[], float tgsArr[])
 {
   if (WiFi.status() != WL_CONNECTED)
     return false;
@@ -334,10 +342,18 @@ bool sendDataToServer(float mq, float ms, float tgs)
   http.begin(FLASK_API_ENDPOINT.c_str());
   http.addHeader(F("Content-Type"), F("application/json"));
 
-  StaticJsonDocument<200> doc;
-  doc["mq"] = mq;
-  doc["ms"] = ms;
-  doc["tgs"] = tgs;
+  StaticJsonDocument<8192> doc;
+
+  JsonArray mqArray = doc.createNestedArray("mq");
+  JsonArray msArray = doc.createNestedArray("ms");
+  JsonArray tgsArray = doc.createNestedArray("tgs");
+
+  for (int i = 0; i < timeDetection; i++)
+  {
+    mqArray.add(mqArr[i]);
+    msArray.add(msArr[i]);
+    tgsArray.add(tgsArr[i]);
+  }
 
   String payload;
   serializeJson(doc, payload);
@@ -360,6 +376,7 @@ bool sendDataToServer(float mq, float ms, float tgs)
     return false;
   }
 }
+
 
 void loop()
 {

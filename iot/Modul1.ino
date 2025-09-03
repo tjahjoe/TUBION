@@ -69,6 +69,7 @@ float MSSend[timeDetection];
 float MSTotal = 0;
 
 String status = "CLEAN";
+String id;
 
 void setupButton()
 {
@@ -268,7 +269,7 @@ void activateDetection()
     readIndex = (readIndex + 1) % numReadings;
 
     sendDataToAnotherModule(mq, ms, tgs);
-    
+
     MQSend[i] = mq;
     MSSend[i] = ms;
     TGSSend[i] = tgs;
@@ -277,7 +278,7 @@ void activateDetection()
 
   sendDataToServer(MQSend, MSSend, TGSSend);
 
-  Serial2.println("STOP");
+  Serial2.println("STOP " + id);
 
   digitalWrite(LED_RED_PIN, LOW);
 }
@@ -363,10 +364,23 @@ bool sendDataToServer(float mqArr[], float msArr[], float tgsArr[])
   if (httpResponseCode > 0)
   {
     String response = http.getString();
-    Serial.print(F("Flask API Response: "));
-    Serial.println(response);
-    http.end();
-    return true;
+    StaticJsonDocument<256> respDoc;
+    DeserializationError error = deserializeJson(respDoc, response);
+
+    if (!error)
+    {
+      id = respDoc["id"].as<String>();
+
+      http.end();
+      return true;
+    }
+    else
+    {
+      Serial.print("JSON Parse error: ");
+      Serial.println(error.c_str());
+      http.end();
+      return false;
+    }
   }
   else
   {
@@ -376,7 +390,6 @@ bool sendDataToServer(float mqArr[], float msArr[], float tgsArr[])
     return false;
   }
 }
-
 
 void loop()
 {

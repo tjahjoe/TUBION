@@ -1,6 +1,7 @@
+from model import Model
 from flask import request, jsonify
-import io
-import requests
+# import io
+# import requests
 
 class Controller:
     def __init__(self, app_instance):
@@ -11,22 +12,12 @@ class Controller:
         self.__data = None
 
         self.__setup_routes()
+        self.__db_model = Model()
 
     def __setup_routes(self):
         pass
         self._app.add_url_rule('/insert/data', view_func=self._insert_data, methods=['POST'])
         self._app.add_url_rule('/find/data', view_func=self._find_data, methods=['GET'])
-
-
-
-    # def _insert_data(self):
-    #     try:
-    #         data = request.get_json()
-    #         self.__data = data.get('data')
-
-    #         return jsonify({'message': 'Data saved successfully'}), 201
-    #     except Exception as e:
-    #         return str(e), 500
         
     def _insert_data(self):
         try:
@@ -35,7 +26,9 @@ class Controller:
             self.__ms = data.get('ms')
             self.__tgs = data.get('tgs')
 
-            return jsonify({'message': 'Data saved successfully'}), 201
+            inserted_id = self.__db_model.insert_data(self.__mq, self.__ms, self.__tgs)
+
+            return jsonify({'message': 'Data saved successfully', 'id': str(inserted_id)}), 201
         except Exception as e:
             return str(e), 500
     

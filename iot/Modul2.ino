@@ -36,6 +36,15 @@ void stopText(String text)
   delay(3000);
 }
 
+void showId(String id)
+{
+  tft.fillScreen(TFT_BLACK);
+  tft.setTextColor(TFT_WHITE, TFT_BLACK);
+  tft.drawCentreString("ID", tft.width() / 2, tft.height() / 2 - 20, 4);
+  tft.drawCentreString(id, tft.width() / 2, tft.height() / 2 + 10, 4);
+  delay(3000);
+}
+
 void getCommand()
 {
   if (Serial2.available())
@@ -71,9 +80,11 @@ void getData()
         }
       }
 
-      if (receivedData == "STOP")
+      if (receivedData.startsWith("STOP"))
       {
-        stopText("DETECTION MODE");
+        String id = receivedData.substring(5);
+        id.trim();
+        showId(id);
         break;
       }
 

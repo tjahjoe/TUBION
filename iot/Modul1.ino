@@ -32,7 +32,7 @@
 #define TXD2 17
 
 #define WIFI_CONFIG_FILE "/wifi_config.txt"
-const String FLASK_API_ENDPOINT = "http://192.168.1.4:5000/insert/data";
+const String FLASK_API_ENDPOINT = "https://api-tubion.vercel.app/insert/data";
 
 Servo servo;
 

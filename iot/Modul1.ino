@@ -19,8 +19,8 @@
 
 #define SERVO_PIN 21
 
-#define RELAY_FAN_PIN 23
-#define RELAY_MIST_PIN 22
+#define RELAY_FAN_PIN 22
+#define RELAY_MIST_PIN 23
 #define RELAY_PUMP_OUT_PIN 25
 #define RELAY_PUMP_IN_PIN 26
 

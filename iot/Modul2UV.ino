@@ -185,42 +185,6 @@ void displayClean()
   }
 }
 
-void displayDry()
-{
-  tft.fillScreen(TFT_BLACK);
-  tft.setTextColor(TFT_WHITE, TFT_BLACK);
-  tft.drawCentreString("DRYING", tft.width() / 2, tft.height() / 2 - 10, 4);
-
-  while (Serial2.available())
-    Serial2.read();
-
-  while (true)
-  {
-    if (Serial2.available())
-    {
-      String receivedData = Serial2.readStringUntil('\n');
-      receivedData.trim();
-
-      for (int i = 0; i < receivedData.length(); i++)
-      {
-        if (!isPrintable(receivedData.charAt(i)))
-        {
-          receivedData.remove(i, 1);
-          i--;
-        }
-      }
-
-      // Serial.println("Command: " + receivedData);
-
-      if (receivedData == "STOP")
-      {
-        stopText("DRYING MODE");
-        break;
-      }
-    }
-  }
-}
-
 void displayOut()
 {
   tft.fillScreen(TFT_BLACK);
@@ -272,12 +236,6 @@ void loop()
   {
     displayClean();
     status = "CLEAN";
-    defaultText();
-    command = "";
-  }
-  else if (command == "DRY")
-  {
-    displayDry();
     defaultText();
     command = "";
   }

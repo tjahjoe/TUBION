@@ -2,7 +2,6 @@
 #include <ArduinoJson.h>
 #include <WiFi.h>
 #include <HTTPClient.h>
-#include <ESP32Servo.h>
 #include <WiFiManager.h>
 #include <FS.h>
 #include <LittleFS.h>
@@ -17,10 +16,7 @@
 #define BUTTON_BLUE_PIN 27
 #define BUTTON_GREEN_PIN 14
 
-#define SERVO_PIN 21
-
-#define RELAY_FAN_PIN 23
-#define RELAY_MIST_PIN 22
+#define RELAY_UV_PIN 22
 #define RELAY_PUMP_OUT_PIN 25
 #define RELAY_PUMP_IN_PIN 26
 
@@ -33,8 +29,6 @@
 
 #define WIFI_CONFIG_FILE "/wifi_config.txt"
 const String FLASK_API_ENDPOINT = "https://api-tubion.vercel.app/insert/data";
-
-Servo servo;
 
 const int timeDetection = 60;
 const int numReadings = 5;
@@ -81,15 +75,13 @@ void setupButton()
 
 void setupRelay()
 {
-  pinMode(RELAY_MIST_PIN, OUTPUT);
+  pinMode(RELAY_UV_PIN, OUTPUT);
   pinMode(RELAY_PUMP_OUT_PIN, OUTPUT);
   pinMode(RELAY_PUMP_IN_PIN, OUTPUT);
-  pinMode(RELAY_FAN_PIN, OUTPUT);
 
-  digitalWrite(RELAY_MIST_PIN, HIGH);
+  digitalWrite(RELAY_UV_PIN, HIGH);
   digitalWrite(RELAY_PUMP_OUT_PIN, HIGH);
   digitalWrite(RELAY_PUMP_IN_PIN, HIGH);
-  digitalWrite(RELAY_FAN_PIN, HIGH);
 }
 
 void setupLed()
@@ -209,7 +201,6 @@ void setup()
   setupButton();
   setupRelay();
   setupSensor();
-  servo.attach(SERVO_PIN);
 }
 
 void sendDataToAnotherModule(float mq, float ms, float tgs)
@@ -248,12 +239,6 @@ void activateDetection()
 
   Serial2.println("DETECTION");
 
-  // digitalWrite(RELAY_PUMP_IN_PIN, HIGH); 
-  // digitalWrite(RELAY_PUMP_OUT_PIN, LOW);
-  // delay(10000);
-  // digitalWrite(RELAY_PUMP_IN_PIN, LOW);
-  // digitalWrite(RELAY_PUMP_OUT_PIN, LOW);
-
   digitalWrite(RELAY_PUMP_IN_PIN, LOW);
   delay(10000);
   digitalWrite(RELAY_PUMP_IN_PIN, HIGH);
@@ -289,40 +274,19 @@ void activateDetection()
   digitalWrite(LED_RED_PIN, LOW);
 }
 
-void activateDry()
+void activateUV()
 {
   digitalWrite(LED_YELLOW_PIN, HIGH);
 
-  Serial2.println("DRY");
+  Serial2.println("CLEAN");
 
-  digitalWrite(RELAY_FAN_PIN, LOW);
-  servo.write(0);
-  delay(1000);
-  servo.write(90);
+  digitalWrite(RELAY_UV_PIN, LOW);
   delay(10000);
-  servo.write(180);
-  delay(1000);
-  servo.write(90);
-  digitalWrite(RELAY_FAN_PIN, HIGH);
+  digitalWrite(RELAY_UV_PIN, HIGH);
 
   Serial2.println("STOP");
 
   digitalWrite(LED_YELLOW_PIN, LOW);
-}
-
-void activateMist()
-{
-  digitalWrite(LED_BLUE_PIN, HIGH);
-
-  Serial2.println("CLEAN");
-
-  digitalWrite(RELAY_MIST_PIN, LOW);
-  delay(10000);
-  digitalWrite(RELAY_MIST_PIN, HIGH);
-
-  Serial2.println("STOP");
-
-  digitalWrite(LED_BLUE_PIN, LOW);
 }
 
 void activatePumpOut()
@@ -330,12 +294,6 @@ void activatePumpOut()
   digitalWrite(LED_GREEN_PIN, HIGH);
 
   Serial2.println("OUT");
-
-  // digitalWrite(RELAY_PUMP_IN_PIN, LOW);
-  // digitalWrite(RELAY_PUMP_OUT_PIN, HIGH); 
-  // delay(10000);
-  // digitalWrite(RELAY_PUMP_IN_PIN, LOW);
-  // digitalWrite(RELAY_PUMP_OUT_PIN, LOW);
 
   digitalWrite(RELAY_PUMP_OUT_PIN, LOW);
   delay(10000);
@@ -410,13 +368,9 @@ void loop()
     activateDetection();
     status = "DIRT";
   }
-  else if (digitalRead(BUTTON_YELLOW_PIN) == LOW && status == "CLEAN")
+  else if (digitalRead(BUTTON_YELLOW_PIN) == LOW)
   {
-    activateDry();
-  }
-  else if (digitalRead(BUTTON_BLUE_PIN) == LOW)
-  {
-    activateMist();
+    activateUV();
     status = "CLEAN";
   }
   else if (digitalRead(BUTTON_GREEN_PIN) == LOW && status == "CLEAN")
